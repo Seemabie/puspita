@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Puspita's Garden</title>
+<meta name="description" content="A little garden for Puspita. Tap the bud.">
+<meta property="og:title" content="Shovo Shokal, Puspita 🌸">
+<meta property="og:description" content="A little garden for you. Tap the bud.">
+<meta name="theme-color" content="#fff1f6">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23ff4f8b'%3E%3Ccircle cx='50' cy='26' r='20'/%3E%3Ccircle cx='73' cy='43' r='20'/%3E%3Ccircle cx='64' cy='70' r='20'/%3E%3Ccircle cx='36' cy='70' r='20'/%3E%3Ccircle cx='27' cy='43' r='20'/%3E%3C/g%3E%3Ccircle cx='50' cy='50' r='13' fill='%23ffc93c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atma:wght@500;600;700&family=Gaegu:wght@400;700&family=Nunito:wght@400;600;700;800&family=Young+Serif&display=swap">
+<style>
+/* Layout: a garden that grows as she taps. Petal progress on top, one chapter per screen, a living flower bed above the nav. */
+:root{
+  --bg:#fff1f6; --bg-2:#f2ecff; --ink:#2b1630; --ink-2:#6e5672; --line:rgba(43,22,48,.1); --card:#ffffff;
+  --rose:#ff4f8b; --rose-2:#ff8fb4; --marigold:#ff9f1c; --sun:#ffc93c; --leaf:#2fa36b; --leaf-2:#8fd8a6; --lilac:#9b7bff; --sky:#6ec6ff; --coral:#ff6f61;
+  --f-display:"Young Serif",Georgia,"Times New Roman",serif;
+  --f-body:"Nunito",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-hand:"Gaegu","Bradley Hand","Segoe Print",cursive;
+  --f-bn:"Atma","Noto Sans Bengali","Hind Siliguri","Kohinoor Bangla",sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;overflow:hidden;color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;background:var(--bg) linear-gradient(180deg,var(--bg) 0%,var(--bg-2) 70%,#eaf7ee 100%)}
+button{font:inherit;color:inherit;touch-action:manipulation}
+:focus-visible{outline:3px solid var(--lilac);outline-offset:3px}
+
+.aura{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.aura i{position:absolute;border-radius:50%;opacity:.5;-webkit-mask-image:radial-gradient(circle,#000 0,transparent 68%);mask-image:radial-gradient(circle,#000 0,transparent 68%);animation:drift 20s ease-in-out infinite alternate}
+.aura i:nth-child(1){width:70vmax;height:70vmax;top:-30vmax;left:-25vmax;background:#ffc2d6}
+.aura i:nth-child(2){width:60vmax;height:60vmax;top:10vh;right:-30vmax;background:#dccfff;animation-duration:26s}
+.aura i:nth-child(3){width:50vmax;height:50vmax;bottom:-10vmax;left:20vw;background:#ffe2a8;opacity:.35;animation-duration:30s}
+@keyframes drift{to{transform:translate(5vmax,4vmax) scale(1.08)}}
+
+/* frame */
+.app{position:relative;z-index:2;height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.gutter{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top{padding-block:10px 6px}
+.top-in{max-width:560px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.pp{width:42px;height:42px;flex:none;transition:transform .5s}
+.pp ellipse{fill:#f7e1ea;stroke:rgba(43,22,48,.14);stroke-width:1;transition:fill .6s}
+.pp ellipse.on{fill:var(--c)}
+.pp.full{animation:spin 18s linear infinite}
+.top-title{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.15}
+.top-title b{font-family:var(--f-display);font-weight:400;font-size:1.05rem}
+.top-title span{font-size:.74rem;color:var(--ink-2);font-weight:600}
+.icon-btn{width:42px;height:42px;flex:none;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.85);display:grid;place-items:center;cursor:pointer}
+.icon-btn svg{width:19px;height:19px}
+.icon-btn.on .x{display:none}
+.icon-btn.on{background:var(--rose);border-color:var(--rose);color:#fff}
+.icon-btn.on svg{animation:bob 1.3s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-2px) rotate(-6deg)}}
+
+#stage{overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;padding-block:6px 22px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.scene{width:100%;max-width:560px;margin:auto;display:flex;flex-direction:column;gap:16px}
+.scene.enter{animation:bloomIn .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes bloomIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
+
+.bottom{position:relative}
+#garden{display:block;width:100%;height:76px}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:10px 12px;background:#2f8f5b;background:linear-gradient(#3a9d63,#2c8456)}
+.nav .btn-ghost{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.35);color:#fff}
+
+/* shared */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:12px 22px;border-radius:999px;border:1px solid transparent;font-weight:800;font-size:1rem;cursor:pointer;transition:transform .15s,box-shadow .3s,background .2s}
+.btn:active{transform:scale(.95)}
+.btn[disabled]{opacity:.35;cursor:default}
+.btn-rose{background:var(--rose);color:#fff}
+.btn-white{background:#fff;color:var(--ink)}
+.btn-ghost{background:#fff;border-color:var(--line);color:var(--ink)}
+.round{width:50px;padding:0;flex:none;font-size:1.2rem}
+.next{white-space:nowrap;min-width:0}
+.next.ready{animation:ready 1.8s ease-out infinite}
+@keyframes ready{0%{box-shadow:0 0 0 0 rgba(255,255,255,.75)}100%{box-shadow:0 0 0 14px rgba(255,255,255,0)}}
+.head{display:flex;flex-direction:column;gap:8px}
+.eyebrow{margin:0;display:flex;align-items:center;gap:8px;font-size:.74rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+.eyebrow .pt{width:10px;height:16px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:var(--c);flex:none}
+.title{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(2.1rem,9vw,2.9rem);line-height:1.02;letter-spacing:-.02em;text-wrap:balance}
+.lede{margin:0;color:var(--ink-2);font-size:1.04rem;text-wrap:pretty}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:0 18px 36px -24px rgba(120,40,90,.45)}
+.hand{margin:0;font-family:var(--f-hand);font-weight:700;font-size:1.45rem;line-height:1.1}
+.status{margin:0;text-align:center;font-size:.8rem;font-weight:700;color:var(--ink-2)}
+.ev{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s ease}
+.ev > span{overflow:hidden}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
+.pop{animation:pop .5s cubic-bezier(.3,1.4,.5,1) both}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* flower component (cover bud and final bloom) */
+.bud{position:relative;width:200px;height:250px;padding:0;border:0;background:none;cursor:pointer;flex:none}
+.stem{position:absolute;left:97px;top:100px;width:6px;height:150px;border-radius:6px;background:linear-gradient(90deg,#2c8456,#4cb878)}
+.leaf{position:absolute;width:42px;height:18px;border-radius:50%;background:linear-gradient(#5cc285,#2f8f5b)}
+.leaf.l{left:58px;top:178px;transform:rotate(-28deg)}
+.leaf.r{left:100px;top:150px;transform:rotate(26deg)}
+.petals{position:absolute;left:100px;top:95px;width:0;height:0}
+.petals i{position:absolute;left:-23px;bottom:0;width:46px;height:74px;border-radius:50% 50% 50% 50%/62% 62% 38% 38%;background:linear-gradient(180deg,#ff9cc0,var(--rose) 75%);transform-origin:50% 100%;transform:rotate(calc((var(--i) - 3.5) * 5deg)) scale(.5,.62);transition:transform .95s cubic-bezier(.3,1.5,.5,1) calc(var(--i) * 40ms)}
+.petals i:nth-child(even){background:linear-gradient(180deg,#ffc0d6,#ff6d9e 75%)}
+.petals.inner i{left:-16px;width:32px;height:50px;background:linear-gradient(180deg,#fff0f6,#ffb3cd);transform:rotate(calc(var(--i) * 45deg + 22deg)) scale(0)}
+.petals.inner i:nth-child(even){background:linear-gradient(180deg,#fff,#ffc9db)}
+.bud .core{position:absolute;left:83px;top:78px;width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe48a,var(--sun) 45%,var(--marigold));box-shadow:inset 0 0 0 3px rgba(224,122,0,.25);transform:scale(0);transition:transform .6s cubic-bezier(.3,1.6,.5,1) .35s}
+.bud:not(.open) .petals:not(.inner){animation:wiggle 2.2s ease-in-out infinite}
+@keyframes wiggle{25%{transform:rotate(-5deg)}75%{transform:rotate(5deg)}}
+.bud.open .petals i{transform:rotate(calc(var(--i) * 45deg)) scale(1)}
+.bud.open .petals.inner i{transform:rotate(calc(var(--i) * 45deg + 22deg)) scale(1);transition-delay:calc(.25s + var(--i) * 40ms)}
+.bud.open .core{transform:scale(1)}
+.bud.spin .petals{animation:spin 40s linear infinite}
+
+/* cover */
+.cover{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;overflow-y:auto;padding-block:max(24px,env(safe-area-inset-top,0px)) max(24px,env(safe-area-inset-bottom,0px));padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));background:radial-gradient(circle at 15% 12%,rgba(255,143,180,.45),transparent 45%),radial-gradient(circle at 88% 30%,rgba(155,123,255,.32),transparent 45%),radial-gradient(circle at 50% 100%,rgba(143,216,166,.5),transparent 50%),var(--bg)}
+.cover.leaving{animation:coverOut .8s ease forwards}
+@keyframes coverOut{50%{opacity:1}to{opacity:0;transform:scale(1.04)}}
+.cover-in{margin:auto;width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.cv-hi{margin:0;font-family:var(--f-hand);font-weight:700;font-size:1.5rem;color:var(--lilac)}
+.cv-bn{margin:0;font-family:var(--f-bn);font-weight:700;font-size:clamp(3.6rem,17vw,5rem);line-height:1.1;color:var(--rose)}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .cv-bn,.fin-bn{background:linear-gradient(90deg,var(--marigold),var(--rose) 45%,var(--lilac));-webkit-background-clip:text;background-clip:text;color:transparent}
+}
+.cv-sub{margin:0;font-family:var(--f-display);font-size:1.2rem}
+.cv-hint{margin:0;min-height:1.6em;font-weight:800;font-size:.95rem;letter-spacing:.06em;color:var(--rose)}
+.cv-hint.blink{animation:blink 2s ease-in-out infinite}
+@keyframes blink{50%{opacity:.45}}
+.cv-note{margin:0;font-size:.9rem;color:var(--ink-2)}
+
+/* 1 name */
+.names{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.nm{position:relative;height:170px;padding:0;border:0;border-radius:24px;cursor:pointer;overflow:hidden;background:#fff;box-shadow:0 18px 36px -24px rgba(120,40,90,.5);border:1px solid var(--line)}
+.nm > span{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px;text-align:center;transition:opacity .45s,transform .45s}
+.nm-word{font-family:var(--f-display);font-size:clamp(1.5rem,6.4vw,1.9rem)}
+.nm-tap{font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--rose);animation:blink 2s ease-in-out infinite}
+.nm-back{opacity:0;transform:scale(.9);color:#fff;background:linear-gradient(150deg,var(--rose),var(--lilac))}
+.nm.b2 .nm-back{background:linear-gradient(150deg,var(--leaf),var(--sky))}
+.nm.open .nm-front{opacity:0;transform:scale(1.1)}
+.nm.open .nm-back{opacity:1;transform:none}
+.nm-bn{font-family:var(--f-bn);font-weight:700;font-size:2rem;line-height:1.1}
+.nm-big{font-family:var(--f-display);font-size:1.6rem;line-height:1.1}
+.nm-mean{font-weight:700;font-size:.98rem;line-height:1.3}
+.name-sum{display:flex;flex-direction:column;gap:10px;padding:18px 20px}
+.name-sum p{margin:0}
+.name-sum .big{font-family:var(--f-display);font-size:1.4rem;line-height:1.25}
+.name-sum .hand{color:var(--rose)}
+
+/* 2 fact check */
+.claims{display:flex;flex-direction:column;gap:10px}
+.claim{position:relative;display:flex;flex-direction:column;gap:2px;width:100%;padding:16px 18px;text-align:left;border-radius:22px;border:1px solid var(--line);background:#fff;cursor:pointer;overflow:hidden;transition:border-color .3s,box-shadow .3s,transform .15s}
+.claim:active{transform:scale(.98)}
+.claim .q{font-family:var(--f-display);font-size:1.25rem;line-height:1.25;padding-right:96px}
+.claim .who{font-size:.78rem;font-weight:700;color:var(--ink-2)}
+.claim .ev > span{padding-top:0;font-size:.98rem;color:var(--ink)}
+.claim.checked .ev{grid-template-rows:1fr}
+.claim.checked .ev > span{padding-top:10px}
+.claim .tapme{position:absolute;right:16px;top:18px;font-size:.66rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);border:1px dashed rgba(43,22,48,.3);border-radius:999px;padding:4px 10px}
+.claim.checked .tapme{display:none}
+.claim .stamp{position:absolute;right:12px;top:14px;padding:4px 10px;border:3px solid var(--sc,var(--rose));border-radius:8px;color:var(--sc,var(--rose));font-weight:800;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;opacity:0;transform:rotate(-10deg) scale(2);pointer-events:none}
+.claim.checked .stamp{animation:stamp .45s cubic-bezier(.3,1.4,.5,1) forwards}
+.claim.checked{border-color:rgba(255,79,139,.4);box-shadow:0 14px 28px -20px var(--rose)}
+@keyframes stamp{to{opacity:.95;transform:rotate(-10deg) scale(1)}}
+.verdict{padding:16px 18px;text-align:center}
+.verdict p{margin:0}
+.verdict .hand{color:var(--rose)}
+
+/* 3 jar */
+.jar-wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+.jar{position:relative;width:170px;height:190px;margin-top:26px;border-radius:30px 30px 46px 46px;border:3px solid rgba(43,22,48,.16);background:linear-gradient(90deg,rgba(255,255,255,.75),rgba(255,255,255,.25) 35%,rgba(255,255,255,.55) 70%,rgba(255,255,255,.8));box-shadow:inset 0 -14px 24px rgba(255,79,139,.1),0 20px 30px -22px rgba(120,40,90,.6);transition:box-shadow .6s}
+.jar::after{content:"";position:absolute;left:16px;top:18px;width:10px;height:120px;border-radius:10px;background:rgba(255,255,255,.85)}
+.lid{position:absolute;left:24px;right:24px;top:-24px;height:24px;border-radius:10px 10px 4px 4px;background:repeating-linear-gradient(90deg,var(--marigold) 0 8px,#ffb347 8px 16px);box-shadow:0 3px 0 rgba(0,0,0,.08)}
+.lid .bow{position:absolute;left:50%;top:-14px;transform:translateX(-50%) scale(0);font-size:1.6rem;line-height:1;transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.jar.full .lid .bow{transform:translateX(-50%) scale(1)}
+.jar.full{box-shadow:inset 0 -14px 24px rgba(255,79,139,.15),0 0 0 6px rgba(255,201,60,.25),0 0 40px rgba(255,201,60,.45)}
+.in{position:absolute;transform:translateX(-50%) rotate(var(--r));font-size:2rem;line-height:1;animation:drop .7s cubic-bezier(.4,1.4,.5,1) both}
+.in svg{width:40px;height:40px;display:block}
+@keyframes drop{from{opacity:0;transform:translate(-50%,-150px) rotate(-40deg)}50%{opacity:1}to{transform:translateX(-50%) rotate(var(--r))}}
+.jar-cap{width:100%;min-height:96px;padding:14px 18px;display:flex;flex-direction:column;gap:4px}
+.jar-cap b{font-family:var(--f-display);font-weight:400;font-size:1.2rem}
+.jar-cap span{color:var(--ink-2);font-size:.96rem}
+.mems{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.mem{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border-radius:20px;border:1px solid var(--line);background:#fff;cursor:pointer;min-width:0;transition:opacity .3s,transform .15s}
+.mem:active{transform:scale(.95)}
+.mem-e{font-size:1.9rem;line-height:1;height:40px;display:grid;place-items:center}
+.mem-e svg{width:40px;height:40px;display:block}
+.mem-l{font-size:.82rem;font-weight:700;line-height:1.2;text-align:center}
+.mem.used{opacity:.45}
+.mem.used .mem-l::after{content:" ✓";color:var(--leaf)}
+
+/* 4 promise */
+.contract{position:relative;padding:22px 20px 20px;border-radius:6px 6px 22px 22px;background:#fffdf7;background-image:repeating-linear-gradient(180deg,transparent 0 31px,rgba(110,198,255,.28) 31px 32px);border:1px solid var(--line);box-shadow:0 22px 40px -26px rgba(120,40,90,.55)}
+.contract::before{content:"";position:absolute;left:44px;top:0;bottom:0;width:2px;background:rgba(255,79,139,.3)}
+.c-head{margin:0 0 6px;padding-left:36px;font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--rose)}
+.c-who{margin:0 0 10px;padding-left:36px;font-size:1rem;line-height:1.6}
+.c-list{list-style:none;margin:0 0 12px;padding:0;display:flex;flex-direction:column;gap:4px}
+.c-item{display:flex;align-items:flex-start;gap:12px;width:100%;padding:6px 0;border:0;background:none;text-align:left;cursor:pointer;font-weight:700;line-height:1.35}
+.c-box{width:26px;height:26px;flex:none;margin-top:-2px;border-radius:8px;border:2px solid rgba(43,22,48,.35);background:#fff;display:grid;place-items:center;font-size:.95rem;color:#fff;transition:background .25s,border-color .25s}
+.c-item[aria-pressed="true"] .c-box{background:var(--leaf);border-color:var(--leaf)}
+.c-item small{display:block;font-weight:600;color:var(--ink-2);font-size:.88rem}
+.c-sign{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-left:36px;margin-bottom:14px}
+.c-sign .hand{font-size:2rem;color:var(--ink)}
+.c-sign span{font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);border-top:1.5px solid rgba(43,22,48,.35);padding-top:4px}
+.c-ask{position:relative;margin:0 0 8px;padding-left:36px;font-weight:800;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.c-btns{display:flex;flex-wrap:wrap;gap:10px;padding-left:36px}
+.c-btns .btn{min-height:46px;padding:10px 16px}
+.c-btns .btn[aria-pressed="true"]{box-shadow:0 0 0 3px var(--sun)}
+.c-stamp{position:absolute;right:0;top:-14px;padding:6px 12px;border:3px solid var(--leaf);border-radius:8px;color:var(--leaf);background:rgba(255,253,247,.8);font-weight:800;font-size:.9rem;letter-spacing:.12em;text-transform:uppercase;line-height:1.2;text-align:center;opacity:0;transform:rotate(-9deg) scale(2);pointer-events:none}
+.c-stamp.watch{border-color:var(--marigold);color:var(--marigold)}
+.c-stamp.show{animation:stamp .45s cubic-bezier(.3,1.4,.5,1) forwards}
+.c-reply{margin:10px 0 0;padding-left:36px;min-height:1.4em;font-family:var(--f-hand);font-weight:700;font-size:1.35rem;color:var(--rose);line-height:1.1}
+.c-ps{margin:14px 0 0;padding-left:36px;font-size:.92rem;color:var(--ink-2)}
+
+/* 5 plans */
+.seeds{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.seed{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px;border-radius:22px;border:1px solid var(--line);background:#fff;text-align:left;cursor:pointer;min-width:0;transition:background .4s,border-color .4s,transform .15s}
+.seed:active{transform:scale(.97)}
+.sd-ico{font-size:1.9rem;line-height:1;display:inline-block}
+.sd-ico.grow{animation:grow .6s cubic-bezier(.3,1.6,.5,1)}
+@keyframes grow{from{transform:scale(.3) translateY(10px)}to{transform:none}}
+.sd-t{font-weight:800;font-size:.98rem;line-height:1.25}
+.seed .ev > span{font-size:.9rem;line-height:1.35;color:var(--ink-2)}
+.seed.open .ev{grid-template-rows:1fr}
+.seed.open{background:linear-gradient(160deg,#fff,#fff0f6);border-color:rgba(255,79,139,.35)}
+.seed .hint{font-size:.66rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--leaf)}
+.seed.open .hint{display:none}
+
+/* 6 final */
+.final{align-items:center;text-align:center}
+.final .head{align-items:center}
+
+/* finale */
+.finale{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;overflow-y:auto;padding-block:max(28px,env(safe-area-inset-top,0px)) max(28px,env(safe-area-inset-bottom,0px));padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));background:linear-gradient(160deg,#ff8fb4 0%,#ff4f8b 35%,#9b7bff 75%,#6ec6ff 100%);color:#fff}
+.fin-in{margin:auto;max-width:500px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.fin-bn{margin:0;font-family:var(--f-bn);font-weight:700;font-size:clamp(2.6rem,12vw,3.6rem);line-height:1.15;color:#fff}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){ .fin-bn{background:linear-gradient(90deg,#fff3b0,#fff 50%,#ffe0ef);-webkit-background-clip:text;background-clip:text;color:transparent} }
+.fin-sm{margin:0;font-weight:800;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.88)}
+.fin-big{margin:2px 0;font-family:var(--f-display);font-size:clamp(2rem,8.6vw,3rem);line-height:1.05;letter-spacing:-.01em;text-wrap:balance}
+.fin-p{margin:0;font-size:1.06rem;max-width:26em;color:rgba(255,255,255,.95)}
+.fin-sig{margin:6px 0 0;font-family:var(--f-hand);font-weight:700;font-size:2.4rem;line-height:1}
+.fin-sig small{display:block;font-size:1.1rem;opacity:.85}
+.fin-row{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:6px}
+.btn-glass{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.45);color:#fff}
+.tiny{margin:0;font-size:.7rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.8)}
+
+#fx{position:fixed;inset:0;z-index:80;width:100%;height:100%;pointer-events:none;display:block}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<div class="aura" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<div class="app" id="app">
+  <header class="top gutter">
+    <div class="top-in">
+      <svg class="pp" id="pp" viewBox="0 0 48 48" aria-hidden="true">
+        <ellipse cx="24" cy="12" rx="6.5" ry="10.5" style="--c:var(--rose)" transform="rotate(0 24 24)"/>
+        <ellipse cx="24" cy="12" rx="6.5" ry="10.5" style="--c:var(--marigold)" transform="rotate(60 24 24)"/>
+        <ellipse cx="24" cy="12" rx="6.5" ry="10.5" style="--c:var(--lilac)" transform="rotate(120 24 24)"/>
+        <ellipse cx="24" cy="12" rx="6.5" ry="10.5" style="--c:var(--sky)" transform="rotate(180 24 24)"/>
+        <ellipse cx="24" cy="12" rx="6.5" ry="10.5" style="--c:var(--leaf)" transform="rotate(240 24 24)"/>
+        <ellipse cx="24" cy="12" rx="6.5" ry="10.5" style="--c:var(--rose-2)" transform="rotate(300 24 24)"/>
+        <circle cx="24" cy="24" r="6" fill="#ffc93c"/>
+      </svg>
+      <span class="top-title"><b>Puspita's Garden</b><span id="ppText">0 of 6 petals</span></span>
+      <button class="icon-btn" id="sound" type="button" aria-pressed="false" aria-label="Turn music on">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/><path class="x" d="M3 3l18 18"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="stage" class="gutter">
+
+    <!-- 1 name -->
+    <section class="scene">
+      <div class="head">
+        <p class="eyebrow"><span class="pt" style="--c:var(--rose)"></span>Petal 1 of 6 · Your name</p>
+        <h1 class="title">Not old fashioned</h1>
+        <p class="lede">You said Puspita Fardous is an old fashioned name. I looked into it. Tap each half.</p>
+      </div>
+      <div class="names">
+        <button class="nm b1" type="button" aria-pressed="false" aria-label="Puspita, tap to see what it means">
+          <span class="nm-front"><span class="nm-word">Puspita</span><span class="nm-tap">tap to bloom</span></span>
+          <span class="nm-back"><span class="nm-bn" lang="bn">পুষ্পিতা</span><span class="nm-mean">flowering, in full bloom</span></span>
+        </button>
+        <button class="nm b2" type="button" aria-pressed="false" aria-label="Fardous, tap to see what it means">
+          <span class="nm-front"><span class="nm-word">Fardous</span><span class="nm-tap">tap to bloom</span></span>
+          <span class="nm-back"><span class="nm-big">Firdous</span><span class="nm-mean">paradise, the garden itself</span></span>
+        </button>
+      </div>
+      <div class="name-sum card pop" id="nameSum" hidden>
+        <p class="big">Put together, your name means a garden of paradise, in full bloom.</p>
+        <p class="hand">That's not old fashioned. That's timeless. I loved it the first time I read it, and I still do.</p>
+      </div>
+    </section>
+
+    <!-- 2 fact check -->
+    <section class="scene" hidden>
+      <div class="head">
+        <p class="eyebrow"><span class="pt" style="--c:var(--marigold)"></span>Petal 2 of 6 · Fact check</p>
+        <h2 class="title">Things you said that are wrong</h2>
+        <p class="lede">I'm a data guy, so I checked the evidence. Tap each claim.</p>
+      </div>
+      <div class="claims">
+        <button class="claim" type="button" aria-pressed="false"><span class="q">“Yes Sir.”</span><span class="who">You, most days</span><span class="ev"><span>Sir is not my name. It's Seemab 😩 “Pakistani pagol sir” is also accepted.</span></span><span class="tapme">Check</span><span class="stamp">False</span></button>
+        <button class="claim" type="button" aria-pressed="false"><span class="q">“I always smile like a crazy person (pagol), right?”</span><span class="who">You, Monday night</span><span class="ev"><span>That smile is my favorite part of every drive. Tomar hashi ek dum shundar.</span></span><span class="tapme">Check</span><span class="stamp">False</span></button>
+        <button class="claim" type="button" aria-pressed="false"><span class="q">“Because I talk too much, right?”</span><span class="who">You, about a 3 hour drive</span><span class="ev"><span>Not even close. Three hours to Pennsylvania with you, and time will still fly.</span></span><span class="tapme">Check</span><span class="stamp">False</span></button>
+        <button class="claim" type="button" aria-pressed="false"><span class="q">“I'm ugly.”</span><span class="who">You, more than once</span><span class="ev"><span>Rejected. At 12:56 AM you wrote “a beautiful girl”, and I'm counting that as a confession. Case closed.</span></span><span class="tapme">Check</span><span class="stamp">False</span></button>
+        <button class="claim" type="button" aria-pressed="false" style="--sc:var(--marigold)"><span class="q">“Lazy.”</span><span class="who">You, about me</span><span class="ev"><span>Okay, this one is partly true. I'm working on it. See petal 4.</span></span><span class="tapme">Check</span><span class="stamp">Partly true</span></button>
+      </div>
+      <div class="verdict card" id="verdict">
+        <p class="status" id="factStatus" aria-live="polite">0 of 5 checked</p>
+      </div>
+    </section>
+
+    <!-- 3 jar -->
+    <section class="scene" hidden>
+      <div class="head">
+        <p class="eyebrow"><span class="pt" style="--c:var(--lilac)"></span>Petal 3 of 6 · Keepsakes</p>
+        <h2 class="title">The memory jar</h2>
+        <p class="lede">Only a few days, and it's already filling up. Tap each one to drop it in.</p>
+      </div>
+      <div class="jar-wrap">
+        <div class="jar" id="jar"><span class="lid"><span class="bow" aria-hidden="true">🎀</span></span></div>
+        <div class="jar-cap card" id="jarCap" aria-live="polite"><b>An empty jar</b><span>Not for long.</span></div>
+      </div>
+      <div class="mems">
+        <button class="mem" type="button" data-t="Jhool momos" data-cap="Monday, 7 PM. You asked me twice if you needed a jacket."><span class="mem-e">🥟</span><span class="mem-l">Jhool momos</span></button>
+        <button class="mem" type="button" data-t="Your hair pin" data-cap="You left it in my hair. “Keep this as a memento.” Kept. Haven't worn it to the office. Yet."><span class="mem-e"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="21" width="36" height="6" rx="3" fill="#b99cff" transform="rotate(-30 24 24)"/><g transform="translate(16 31)"><circle cx="0" cy="-6" r="5" fill="#ff4f8b"/><circle cx="5.7" cy="-1.9" r="5" fill="#ff4f8b"/><circle cx="3.5" cy="4.9" r="5" fill="#ff4f8b"/><circle cx="-3.5" cy="4.9" r="5" fill="#ff4f8b"/><circle cx="-5.7" cy="-1.9" r="5" fill="#ff4f8b"/><circle r="3.4" fill="#ffc93c"/></g></svg></span><span class="mem-l">Your hair pin</span></button>
+        <button class="mem" type="button" data-t="Lemon and ginger" data-cap="“Don't forget to take lemon and ginger.” I was already home. You called me lazy. Fair."><span class="mem-e">🍋</span><span class="mem-l">Lemon &amp; ginger</span></button>
+        <button class="mem" type="button" data-t="Fall colors" data-cap="Long Island, Tuesday evening. I was late and you waited. Lesson learned: 5:15 means 5:15."><span class="mem-e">🍂</span><span class="mem-l">Fall colors</span></button>
+        <button class="mem" type="button" data-t="The midnight park" data-cap="I dropped you home, then came right back. A park in the middle of the night. Best decision of my week."><span class="mem-e">🌙</span><span class="mem-l">Midnight park</span></button>
+        <button class="mem" type="button" data-t="1 AM eggs" data-cap="12:57 AM: “Eggs are boiling.” Peak midnight energy."><span class="mem-e">🥚</span><span class="mem-l">1 AM eggs</span></button>
+      </div>
+    </section>
+
+    <!-- 4 promise -->
+    <section class="scene" hidden>
+      <div class="head">
+        <p class="eyebrow"><span class="pt" style="--c:var(--sky)"></span>Petal 4 of 6 · Aj se pakka</p>
+        <h2 class="title">A signed promise</h2>
+        <p class="lede">You told me to stop eating outside and cook at home. I said “Aj se pakka.” Here it is in writing. Tick each line, then decide.</p>
+      </div>
+      <article class="contract">
+        <p class="c-head">Official promise</p>
+        <p class="c-who">I, Seemab, also known as <b>Pakistani pagol sir</b>, promise the following, starting today:</p>
+        <ul class="c-list">
+          <li><button class="c-item" type="button" aria-pressed="false"><span class="c-box"></span><span>No junk food<small>Even when a friend orders it for me</small></span></button></li>
+          <li><button class="c-item" type="button" aria-pressed="false"><span class="c-box"></span><span>Cook and eat at home more<small>Steaks count as home cooking</small></span></button></li>
+          <li><button class="c-item" type="button" aria-pressed="false"><span class="c-box"></span><span>Gym, today<small>As promised at 8:58 AM</small></span></button></li>
+          <li><button class="c-item" type="button" aria-pressed="false"><span class="c-box"></span><span>Lunch on time<small>You too, Madam. 3:25 PM is not lunch time.</small></span></button></li>
+        </ul>
+        <div class="c-sign"><p class="hand">Seemab</p><span>Signed</span></div>
+        <p class="c-ask">Inspector's decision<span class="c-stamp" id="cStamp"></span></p>
+        <div class="c-btns">
+          <button class="btn btn-rose" id="approve" type="button" aria-pressed="false">Approve ✅</button>
+          <button class="btn btn-ghost" id="unsure" type="button" aria-pressed="false">Not convinced 🤨</button>
+        </div>
+        <p class="c-reply" id="cReply" aria-live="polite"></p>
+        <p class="c-ps">PS. Garlic is approved. I love it. Looking forward to that salad 🥗</p>
+      </article>
+    </section>
+
+    <!-- 5 plans -->
+    <section class="scene" hidden>
+      <div class="head">
+        <p class="eyebrow"><span class="pt" style="--c:var(--leaf)"></span>Petal 5 of 6 · Coming up</p>
+        <h2 class="title">Things to grow</h2>
+        <p class="lede">These are plans we already made. Tap each seed to see it sprout.</p>
+      </div>
+      <div class="seeds">
+        <button class="seed" type="button" aria-pressed="false" data-e="🍁"><span class="sd-ico">🌱</span><span class="sd-t">Pennsylvania, before winter</span><span class="hint">Tap to sprout</span><span class="ev"><span>The place from your photo, on a Sunday, before the leaves are gone. Three hours of you talking. Perfect.</span></span></button>
+        <button class="seed" type="button" aria-pressed="false" data-e="🔥"><span class="sd-ico">🌱</span><span class="sd-t">BBQ with a view</span><span class="hint">Tap to sprout</span><span class="ev"><span>My favorite spot, my marinade. You just bring the hashi.</span></span></button>
+        <button class="seed" type="button" aria-pressed="false" data-e="🥙"><span class="sd-ico">🌱</span><span class="sd-t">Zyara</span><span class="hint">Tap to sprout</span><span class="ev"><span>The Palestinian place I told you about. I already know you'll love it the most.</span></span></button>
+        <button class="seed" type="button" aria-pressed="false" data-e="🥗"><span class="sd-ico">🌱</span><span class="sd-t">Your salad, with garlic</span><span class="hint">Tap to sprout</span><span class="ev"><span>You promised to make it. I already love garlic. Easy deal.</span></span></button>
+        <button class="seed" type="button" aria-pressed="false" data-e="🍛"><span class="sd-ico">🌱</span><span class="sd-t">Beef Tehari</span><span class="hint">Tap to sprout</span><span class="ev"><span>Your YouTube debut. I volunteer as the official taster.</span></span></button>
+        <button class="seed" type="button" aria-pressed="false" data-e="❄️"><span class="sd-ico">🌱</span><span class="sd-t">Vermont snow</span><span class="hint">Tap to sprout</span><span class="ev"><span>When winter comes, the snowy mountains. Heaven, like I said.</span></span></button>
+      </div>
+      <p class="status" id="seedStatus" aria-live="polite">0 of 6 sprouted</p>
+    </section>
+
+    <!-- 6 final -->
+    <section class="scene final" hidden>
+      <div class="head">
+        <p class="eyebrow"><span class="pt" style="--c:var(--rose-2)"></span>Petal 6 of 6 · Full bloom</p>
+        <h2 class="title">Your garden is ready</h2>
+        <p class="lede">Every tap planted something. Look down there. Now one last tap.</p>
+      </div>
+      <button class="bud open spin" id="bigBloom" type="button" aria-label="Tap for full bloom">
+        <span class="stem"></span><span class="leaf l"></span><span class="leaf r"></span>
+        <span class="petals"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i></span>
+        <span class="petals inner"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i></span>
+        <span class="core"></span>
+      </button>
+      <p class="hand" style="color:var(--rose)">Tap the flower</p>
+    </section>
+
+  </main>
+
+  <footer class="bottom">
+    <canvas id="garden" aria-label="Your garden. A flower grows with every tap."></canvas>
+    <div class="nav gutter">
+      <button class="btn btn-ghost round" id="back" type="button" aria-label="Previous petal">←</button>
+      <button class="btn btn-white next" id="next" type="button"><span id="nextLabel">Next</span><span aria-hidden="true">→</span></button>
+    </div>
+  </footer>
+</div>
+
+<div class="finale" id="finale" hidden>
+  <div class="fin-in">
+    <p class="fin-bn" lang="bn">শুভ সকাল</p>
+    <p class="fin-sm">Shovo Shokal, Kaam wali Madam</p>
+    <h2 class="fin-big" id="finTitle" tabindex="-1">Have a lovely day at work, Puspita.</h2>
+    <p class="fin-p">Keep laughing loudly today. It's my favorite sound.</p>
+    <p class="fin-p">And eat lunch on time, please. Not at 3:25. Thik ase?</p>
+    <p class="fin-sig">Seemab<small>(not Sir 😩)</small></p>
+    <div class="fin-row">
+      <button class="btn btn-glass" id="toGarden" type="button">Back to my garden</button>
+      <button class="btn btn-white" id="again" type="button">Start again</button>
+    </div>
+    <p class="tiny">Tap anywhere for petals</p>
+  </div>
+</div>
+
+<div class="cover" id="cover">
+  <div class="cover-in">
+    <p class="cv-hi">Kita kobor? Vala aso ni? 🌸</p>
+    <p class="cv-bn" lang="bn">পুষ্পিতা</p>
+    <p class="cv-sub">A little garden for Puspita</p>
+    <button class="bud" id="bud" type="button" aria-label="Tap the bud to start">
+      <span class="stem"></span><span class="leaf l"></span><span class="leaf r"></span>
+      <span class="petals"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i></span>
+      <span class="petals inner"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i></span>
+      <span class="core"></span>
+    </button>
+    <p class="cv-hint blink" id="cvHint">Tap the bud</p>
+    <p class="cv-note">🎧 There's music. Turn it up a little.</p>
+  </div>
+</div>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<script>
+(() => {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const buzz = (ms = 12) => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} };
+  const PETAL = ['#ff4f8b', '#ff8fb4', '#ffc0d6', '#9b7bff', '#ffc93c', '#ff9f1c', '#6ec6ff', '#ffffff'];
+  const FLOWER = ['#ff4f8b', '#ff8fb4', '#9b7bff', '#ff6f61', '#ffc93c', '#6ec6ff', '#c79bff'];
+  const TYPES = ['five', 'five', 'daisy', 'tulip', 'marigold'];
+
+  /* ---------- canvases ---------- */
+  const fx = $('#fx'), gEl = $('#garden');
+  let fctx, FW, FH, gctx, GW, GH;
+  const parts = [], flowers = [];
+  let blades = [];
+  function fit() {
+    const d = Math.min(window.devicePixelRatio || 1, 2);
+    FW = window.innerWidth; FH = window.innerHeight;
+    fx.width = Math.round(FW * d); fx.height = Math.round(FH * d);
+    fctx = fx.getContext('2d'); fctx.setTransform(d, 0, 0, d, 0, 0);
+    const r = gEl.getBoundingClientRect();
+    const oldW = GW || r.width;
+    GW = r.width; GH = r.height;
+    gEl.width = Math.round(GW * d); gEl.height = Math.round(GH * d);
+    gctx = gEl.getContext('2d'); gctx.setTransform(d, 0, 0, d, 0, 0);
+    flowers.forEach(f => { f.x = f.x / oldW * GW; });
+    blades = [];
+    for (let x = 0; x < GW; x += 4) blades.push({ x: x + rand(-1.5, 1.5), h: rand(5, 15), lean: rand(-3, 3), c: pick(['#3bb273', '#2fa36b', '#58c27f', '#2c8456']) });
+  }
+  const easeBack = x => 1 + 2.70158 * Math.pow(x - 1, 3) + 1.70158 * Math.pow(x - 1, 2);
+
+  function plant(n = 1) {
+    for (let i = 0; i < n; i++) {
+      if (flowers.length >= 160) flowers.shift();
+      flowers.push({ x: rand(8, GW - 8), h: rand(GH * .32, GH * .86), t: reduce ? 1 : 0, type: pick(TYPES), c: pick(FLOWER), s: rand(.85, 1.25), ph: rand(0, 6.28), side: Math.random() < .5 ? -1 : 1 });
+    }
+    flowers.sort((a, b) => b.h - a.h);
+  }
+  function head(ctx, f) {
+    if (f.type === 'five') {
+      ctx.fillStyle = f.c;
+      for (let k = 0; k < 5; k++) { const a = k * 1.2566 - 1.5708; ctx.beginPath(); ctx.arc(Math.cos(a) * 5.5, Math.sin(a) * 5.5, 5, 0, 6.2832); ctx.fill(); }
+      ctx.fillStyle = '#ffc93c'; ctx.beginPath(); ctx.arc(0, 0, 3.4, 0, 6.2832); ctx.fill();
+    } else if (f.type === 'daisy') {
+      ctx.fillStyle = '#ffffff';
+      for (let k = 0; k < 10; k++) { ctx.save(); ctx.rotate(k * .6283); ctx.beginPath(); ctx.ellipse(0, -6, 2.3, 5.2, 0, 0, 6.2832); ctx.fill(); ctx.restore(); }
+      ctx.fillStyle = '#ffb627'; ctx.beginPath(); ctx.arc(0, 0, 3.6, 0, 6.2832); ctx.fill();
+    } else if (f.type === 'tulip') {
+      ctx.fillStyle = f.c; ctx.beginPath();
+      ctx.moveTo(-6.5, -9); ctx.lineTo(-3, -4); ctx.lineTo(0, -10); ctx.lineTo(3, -4); ctx.lineTo(6.5, -9);
+      ctx.quadraticCurveTo(8, 2, 0, 3); ctx.quadraticCurveTo(-8, 2, -6.5, -9); ctx.fill();
+    } else {
+      ctx.fillStyle = '#ff9f1c';
+      for (let k = 0; k < 12; k++) { const a = k * .5236; ctx.beginPath(); ctx.arc(Math.cos(a) * 6, Math.sin(a) * 6, 3.6, 0, 6.2832); ctx.fill(); }
+      ctx.fillStyle = '#ffc93c';
+      for (let k = 0; k < 8; k++) { const a = k * .7854 + .3; ctx.beginPath(); ctx.arc(Math.cos(a) * 3.3, Math.sin(a) * 3.3, 3, 0, 6.2832); ctx.fill(); }
+      ctx.fillStyle = '#e07a00'; ctx.beginPath(); ctx.arc(0, 0, 1.8, 0, 6.2832); ctx.fill();
+    }
+  }
+  function drawGarden(dt, time) {
+    const ctx = gctx, g = GH - 3;
+    ctx.clearRect(0, 0, GW, GH);
+    const grd = ctx.createLinearGradient(0, GH - 14, 0, GH);
+    grd.addColorStop(0, 'rgba(58,157,99,0)'); grd.addColorStop(1, '#3a9d63');
+    ctx.fillStyle = grd; ctx.fillRect(0, GH - 14, GW, 14);
+    for (const f of flowers) {
+      if (f.t < 1) f.t = Math.min(1, f.t + dt * 1.5);
+      const t = f.t, sway = reduce ? 0 : Math.sin(time * 1.3 + f.ph) * 2.4 * t;
+      const ty = g - f.h * Math.min(1, t / .7), tx = f.x + sway;
+      ctx.strokeStyle = '#2f8f5b'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(f.x, g); ctx.quadraticCurveTo(f.x + sway * .3, (g + ty) / 2, tx, ty); ctx.stroke();
+      if (t > .4) {
+        const lt = Math.min(1, (t - .4) / .3), ly = g - (g - ty) * .38;
+        ctx.save(); ctx.translate(f.x + sway * .12, ly); ctx.rotate(f.side * .6); ctx.scale(lt, lt);
+        ctx.fillStyle = '#3bb273'; ctx.beginPath(); ctx.ellipse(f.side * 6, 0, 7, 2.8, 0, 0, 6.2832); ctx.fill(); ctx.restore();
+      }
+      if (t > .6) {
+        const k = easeBack(Math.min(1, (t - .6) / .4)) * f.s;
+        ctx.save(); ctx.translate(tx, ty); ctx.scale(k, k); head(ctx, f); ctx.restore();
+      }
+    }
+    for (const b of blades) {
+      ctx.fillStyle = b.c; ctx.beginPath();
+      ctx.moveTo(b.x - 1.6, GH); ctx.lineTo(b.x + b.lean + (reduce ? 0 : Math.sin(time * 1.6 + b.x) * .8), GH - b.h); ctx.lineTo(b.x + 1.6, GH); ctx.fill();
+    }
+  }
+
+  function burst(x, y, o = {}) {
+    if (reduce) return;
+    const n = o.n || 26;
+    for (let i = 0; i < n; i++) {
+      const a = o.rain ? rand(1.3, 1.85) : rand(0, Math.PI * 2);
+      const sp = o.rain ? rand(40, 110) : rand(120, o.power || 420);
+      const life = rand(1.6, o.rain ? 5 : 2.6);
+      parts.push({ x: o.rain ? rand(0, FW) : x, y: o.rain ? rand(-40, -10) : y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - (o.rain ? 0 : rand(60, 160)),
+        life, max: life, rot: rand(0, 6.28), vr: rand(-5, 5), s: rand(9, o.big ? 18 : 14), c: pick(o.colors || PETAL), ph: rand(0, 6.28), fr: rand(2, 4), k: Math.random() < .8 ? 'p' : 'c' });
+    }
+  }
+  function burstAt(el, o) { const r = el.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, o); }
+  function drawFx(dt, time) {
+    const ctx = fctx;
+    ctx.clearRect(0, 0, FW, FH);
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const p = parts[i];
+      p.life -= dt;
+      if (p.life <= 0 || p.y > FH + 40) { parts.splice(i, 1); continue; }
+      p.vx = p.vx * .975 + Math.sin(time * p.fr + p.ph) * 40 * dt;
+      p.vy = p.vy * .975 + 200 * dt;
+      p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt;
+      ctx.save(); ctx.globalAlpha = Math.min(1, p.life / p.max * 2); ctx.fillStyle = p.c;
+      ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      if (p.k === 'p') { ctx.beginPath(); ctx.ellipse(0, 0, p.s * .5, p.s * .28, 0, 0, 6.2832); ctx.fill(); }
+      else { ctx.beginPath(); ctx.arc(0, 0, p.s * .16, 0, 6.2832); ctx.fill(); }
+      ctx.restore();
+    }
+  }
+  let last = 0;
+  function frame(now) {
+    const dt = last ? Math.min(.05, (now - last) / 1000) : .016; last = now;
+    const t = now / 1000;
+    drawGarden(dt, t);
+    drawFx(dt, t);
+    requestAnimationFrame(frame);
+  }
+
+  /* ---------- music (Interlude.mp3 in the same folder) and soft plucks ---------- */
+  const music = new Audio();
+  let musicOK = true;
+  music.addEventListener('error', () => { musicOK = false; });
+  music.src = 'Interlude.mp3';
+  music.loop = true;
+  music.preload = 'auto';
+  let ac = null, soundOn = false;
+  function A() {
+    if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ac = null; } }
+    if (ac && ac.state === 'suspended') ac.resume();
+    return ac;
+  }
+  function tone(f, t0, dur, vol) {
+    const a = A(); if (!a) return;
+    const g = a.createGain(); g.connect(a.destination);
+    g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + .01); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+    const o = a.createOscillator(); o.type = 'sine'; o.frequency.value = f; o.connect(g); o.start(t0); o.stop(t0 + dur + .05);
+  }
+  function pluck() { if (!soundOn) return; const a = A(); if (!a) return; tone(pick([1046.5, 1174.7, 1318.5, 1568, 1760]), a.currentTime, .45, .045); }
+  function chord() { if (!soundOn) return; const a = A(); if (!a) return; const t = a.currentTime; [783.99, 987.77, 1174.7, 1568].forEach((f, i) => tone(f, t + i * .09, .9, .05)); }
+  function playMusic() { if (!musicOK) return; try { music.volume = .6; } catch (e) {} const p = music.play(); if (p && p.catch) p.catch(() => {}); }
+  const sBtn = $('#sound');
+  function setSound(on) {
+    soundOn = on;
+    sBtn.classList.toggle('on', on);
+    sBtn.setAttribute('aria-pressed', String(on));
+    sBtn.setAttribute('aria-label', on ? 'Turn music off' : 'Turn music on');
+    if (on) { A(); playMusic(); } else music.pause();
+  }
+  sBtn.addEventListener('click', () => setSound(!soundOn));
+  document.addEventListener('visibilitychange', () => { if (!soundOn) return; if (document.hidden) music.pause(); else playMusic(); });
+
+  /* one helper for every happy tap */
+  function joy(el, n) { if (el) burstAt(el, { n: n || 16 }); plant(1); pluck(); buzz(); }
+
+  /* ---------- chapters ---------- */
+  const scenes = $$('.scene'), LAST = scenes.length - 1, stage = $('#stage');
+  const nextBtn = $('#next'), backBtn = $('#back'), nextLbl = $('#nextLabel');
+  const NAMES = ['Your name', 'Fact check', 'Memory jar', 'Aj se pakka', 'Plans', 'Full bloom'];
+  const petals = $$('#pp ellipse'), done = new Set(), hooks = {};
+  let cur = 0;
+  function updateNav() {
+    backBtn.disabled = cur === 0;
+    nextBtn.hidden = cur >= LAST;
+    if (cur < LAST) nextLbl.textContent = 'Next: ' + NAMES[cur + 1];
+    nextBtn.classList.toggle('ready', done.has(cur));
+  }
+  function go(i) {
+    if (i < 0 || i > LAST || i === cur) return;
+    scenes[cur].hidden = true; scenes[cur].classList.remove('enter');
+    cur = i;
+    const s = scenes[cur]; s.hidden = false; void s.offsetWidth; s.classList.add('enter');
+    stage.scrollTop = 0; updateNav(); plant(1);
+    if (hooks[cur]) hooks[cur]();
+  }
+  function markDone(i) {
+    if (done.has(i)) return;
+    done.add(i);
+    petals[i].classList.add('on');
+    $('#ppText').textContent = `${done.size} of 6 petals`;
+    if (done.size === 6) $('#pp').classList.add('full');
+    plant(4); chord();
+    if (i === cur) nextBtn.classList.add('ready');
+  }
+  nextBtn.addEventListener('click', () => { buzz(); go(cur + 1); });
+  backBtn.addEventListener('click', () => go(cur - 1));
+  document.addEventListener('keydown', e => {
+    if (!fin.hidden) { if (e.key === 'Escape') closeFinale(); return; }
+    if (!cover.hidden) return;
+    if (e.key === 'ArrowRight') go(cur + 1);
+    if (e.key === 'ArrowLeft') go(cur - 1);
+  });
+
+  /* cover */
+  const cover = $('#cover'), bud = $('#bud');
+  bud.addEventListener('click', () => {
+    if (bud.classList.contains('open')) return;
+    bud.classList.add('open'); buzz(25);
+    setSound(true);
+    const h = $('#cvHint'); h.classList.remove('blink'); h.textContent = 'Shovo Shokal, Puspita ☀️';
+    setTimeout(() => { burstAt(bud.querySelector('.core'), { n: 60, power: 480, big: true }); chord(); }, reduce ? 0 : 450);
+    setTimeout(() => cover.classList.add('leaving'), reduce ? 0 : 1500);
+    setTimeout(() => {
+      cover.hidden = true; fit(); plant(5);
+      scenes[0].classList.add('enter');
+      nextBtn.focus({ preventScroll: true });
+    }, reduce ? 60 : 2300);
+  });
+
+  /* 1 name */
+  const nms = $$('.nm');
+  nms.forEach(b => b.addEventListener('click', () => {
+    joy(b, 30);
+    if (b.classList.contains('open')) return;
+    b.classList.add('open'); b.setAttribute('aria-pressed', 'true');
+    plant(2);
+    if (nms.every(x => x.classList.contains('open'))) {
+      $('#nameSum').hidden = false;
+      setTimeout(() => $('#nameSum').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' }), 80);
+      markDone(0);
+    }
+  }));
+
+  /* 2 fact check */
+  const claims = $$('.claim'); let checked = 0;
+  claims.forEach(c => c.addEventListener('click', () => {
+    joy(c.querySelector('.stamp'), 14);
+    if (c.classList.contains('checked')) return;
+    c.classList.add('checked'); c.setAttribute('aria-pressed', 'true');
+    checked++;
+    const st = $('#factStatus');
+    if (checked < claims.length) { st.textContent = `${checked} of ${claims.length} checked`; return; }
+    $('#verdict').innerHTML = '<p class="status">Final verdict</p><p class="hand">4 false, 1 partly true. You\'re wrong about yourself, and right about me.</p>';
+    $('#verdict').classList.add('pop');
+    burstAt($('#verdict'), { n: 50 });
+    markDone(1);
+  }));
+
+  /* 3 jar */
+  const SLOTS = [[30, 8, -8], [68, 10, 10], [48, 30, 4], [24, 46, -12], [70, 48, 8], [46, 66, -4]];
+  const jar = $('#jar'); let dropped = 0;
+  $$('.mem').forEach(m => m.addEventListener('click', () => {
+    joy(m, 12);
+    const cap = $('#jarCap');
+    cap.innerHTML = `<b>${m.dataset.t}</b><span>${m.dataset.cap}</span>`;
+    cap.classList.remove('pop'); void cap.offsetWidth; cap.classList.add('pop');
+    if (m.classList.contains('used')) return;
+    m.classList.add('used');
+    const [x, y, r] = SLOTS[dropped++];
+    const s = document.createElement('span');
+    s.className = 'in'; s.style.left = x + '%'; s.style.bottom = y + '%'; s.style.setProperty('--r', r + 'deg');
+    s.innerHTML = m.querySelector('.mem-e').innerHTML;
+    s.setAttribute('aria-hidden', 'true');
+    jar.appendChild(s);
+    if (dropped === SLOTS.length) {
+      setTimeout(() => {
+        jar.classList.add('full');
+        burstAt(jar, { n: 60, power: 460 });
+        const c2 = $('#jarCap');
+        c2.innerHTML = '<b>Jar sealed 🎀</b><span>All of that in a few days. Plenty of room for more.</span>';
+        markDone(2);
+      }, 700);
+    }
+  }));
+
+  /* 4 promise */
+  const items = $$('.c-item'); let ticks = 0;
+  items.forEach(it => it.addEventListener('click', () => {
+    joy(it.querySelector('.c-box'), 10);
+    const on = it.getAttribute('aria-pressed') !== 'true';
+    it.setAttribute('aria-pressed', String(on));
+    it.querySelector('.c-box').textContent = on ? '✓' : '';
+    ticks += on ? 1 : -1;
+  }));
+  const stamp = $('#cStamp');
+  function decide(ok) {
+    stamp.classList.remove('show', 'watch'); void stamp.offsetWidth;
+    if (ok) {
+      stamp.textContent = 'Approved';
+      $('#cReply').textContent = ticks < items.length ? 'Approved before reading every line? Trusting me already 🤭' : 'Yay! I won\'t let you down, Inspector.';
+    } else {
+      stamp.textContent = 'Under watch'; stamp.classList.add('watch');
+      $('#cReply').textContent = 'Fair. Ask me tonight what I ate. I\'ll send photos as evidence.';
+    }
+    stamp.classList.add('show');
+    $('#approve').setAttribute('aria-pressed', String(ok));
+    $('#unsure').setAttribute('aria-pressed', String(!ok));
+    joy(stamp, ok ? 40 : 20);
+    markDone(3);
+  }
+  $('#approve').addEventListener('click', () => decide(true));
+  $('#unsure').addEventListener('click', () => decide(false));
+
+  /* 5 plans */
+  const seeds = $$('.seed'); let sprouted = 0;
+  seeds.forEach(s => s.addEventListener('click', () => {
+    joy(s.querySelector('.sd-ico'), 18);
+    if (s.classList.contains('open')) return;
+    s.classList.add('open'); s.setAttribute('aria-pressed', 'true');
+    const ico = s.querySelector('.sd-ico'); ico.textContent = s.dataset.e; ico.classList.add('grow');
+    plant(2);
+    sprouted++;
+    const st = $('#seedStatus');
+    st.textContent = sprouted < seeds.length ? `${sprouted} of ${seeds.length} sprouted` : 'All six sprouted. That\'s a lot of plans. I like it.';
+    if (sprouted === seeds.length) markDone(4);
+  }));
+
+  /* 6 finale */
+  const fin = $('#finale');
+  let rainTimer = null;
+  hooks[5] = () => markDone(5);
+  function openFinale() {
+    fin.hidden = false; fin.scrollTop = 0;
+    $('#finTitle').focus({ preventScroll: true });
+    chord(); buzz(40); plant(12);
+    [100, 500, 950, 1500].forEach(ms => setTimeout(() => burst(rand(FW * .2, FW * .8), rand(FH * .2, FH * .5), { n: 70, power: 560, big: true }), ms));
+    clearInterval(rainTimer);
+    if (!reduce) rainTimer = setInterval(() => burst(0, 0, { n: 2, rain: true }), 280);
+  }
+  function closeFinale() { fin.hidden = true; clearInterval(rainTimer); rainTimer = null; }
+  $('#bigBloom').addEventListener('click', e => { burstAt(e.currentTarget, { n: 40 }); openFinale(); });
+  fin.addEventListener('pointerdown', e => { if (e.target.closest('button')) return; burst(e.clientX, e.clientY, { n: 26 }); plant(1); pluck(); buzz(); });
+  $('#toGarden').addEventListener('click', closeFinale);
+  $('#again').addEventListener('click', () => { closeFinale(); go(0); });
+
+  /* start */
+  fit(); updateNav(); plant(3);
+  window.addEventListener('resize', fit);
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
